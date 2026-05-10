@@ -1,28 +1,88 @@
 {
+  "log": {
+    "loglevel": "warning",
+    "access": "none",
+    "error": "/tmp/xray-error.log"
+  },
+  "dns": {
+    "servers": [
+      {
+        "address": "https://1.1.1.1/dns-query",
+        "domains": [
+          "geosite:geolocation-!cn"
+        ],
+        "queryStrategy": "UseIP"
+      },
+      "8.8.8.8",
+      "localhost"
+    ],
+    "queryStrategy": "UseIPv4"
+  },
   "inbounds": [
     {
+      "tag": "vless-in",
       "port": 443,
+      "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
         "clients": [
           {
-            "id": "550e8400-e29b-41d4-a716-446655440000"
+            "id": "45230f82-760f-48ec-b48e-5d1910899446",
+            "flow": "",
+            "level": 0,
+            "email": "user@supreme-enigma-965xp449g97c954.github.dev"
           }
         ],
         "decryption": "none"
       },
       "streamSettings": {
         "network": "xhttp",
+        "security": "none",
         "xhttpSettings": {
           "mode": "packet-up",
-          "path": "/"
+          "path": "/",
+          "maxUploadSize": 1000000,
+          "maxConcurrentUploads": 10
         }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ],
+        "routeOnly": false
       }
     }
   ],
   "outbounds": [
     {
-      "protocol": "freedom"
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
     }
-  ]
+  ],
+  "policy": {
+    "levels": {
+      "0": {
+        "handshake": 4,
+        "connIdle": 300,
+        "uplinkOnly": 2,
+        "downlinkOnly": 5,
+        "bufferSize": 512
+      }
+    }
+  }
 }
